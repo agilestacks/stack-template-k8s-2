@@ -1,0 +1,170 @@
+parameters:
+- name: component.kubernetes
+  parameters:
+  - name: eks.cluster
+    empty: allow
+    fromEnv: EKS_CLUSTER
+  - name: eks.admin
+    fromEnv: EKS_ADMIN
+  - name: worker
+    parameters:
+    - name: count
+      fromEnv: EKS_WORKER_COUNT
+    - name: size
+      fromEnv: EKS_WORKER_INSTANCE_TYPE
+    - name: aws.spotPrice
+      fromEnv: EKS_WORKER_SPOT_PRICE
+      empty: allow
+
+- name: component.acm
+  parameters:
+  - name: additionalNames
+    value: >
+      app.${dns.domain}
+      *.app.${dns.domain}
+      apps.${dns.domain}
+      *.apps.${dns.domain}
+      auth.${dns.domain}
+      git.${dns.domain}
+      *.svc.${dns.domain}
+
+- name: component.ingress
+  parameters:
+  - name: urlPrefix
+    value: app
+  - name: ssoUrlPrefix
+    value: apps
+
+- name: component.cluster-autoscaler
+  parameters:
+  - name: enabled
+    value: true
+  - name: asgTagCluster
+    value: ${kubernetes.eks.cluster}
+    kind: link
+
+- name: component.dex
+  parameters:
+  - name: namespace
+    value: dex
+  - name: okta.issuer
+    fromEnv: DEX_OKTA_APP_ISSUER
+  - name: okta.clientId
+    fromEnv: DEX_OKTA_APP_CLIENT_ID
+  - name: okta.clientSecret
+    fromEnv: DEX_OKTA_APP_CLIENT_SECRET
+
+- name: component.namespace
+  component: automation-tasks-namespace
+  parameters:
+  - name: name
+    value: automation-tasks
+
+- name: component.jenkins
+  parameters:
+  - name: namespace
+    value: jenkins
+
+- name: component.minio
+  parameters:
+  - name: secretKey
+    fromEnv: COMPONENT_MINIO_SECRET_KEY
+
+- name: component.mongodb
+  component: mongodb
+  parameters:
+  - name: database
+    value: mongodb
+  - name: password
+    fromEnv: COMPONENT_MONGODB_PASSWORD
+  - name: storageType
+    value: ebs
+  - name: user
+    value: mongodb
+  - name: volumeSize
+    value: 8Gi
+  - name: volumeType
+    value: gp2
+
+- name: component.pgweb
+  component: postgresql-pgweb
+  parameters:
+  - name: name
+    value: postgresql-pgweb
+
+- name: component.pgweb
+  component: postgresql-rds-pgweb
+  parameters:
+  - name: name
+    value: postgresql-rds-pgweb
+
+- name: component.postgresql
+  component: postgresql
+  parameters:
+  - name: database
+    value: postgres
+  - name: name
+    value: postgresql
+  - name: namespace
+    value: postgresql
+  - name: password
+    fromEnv: COMPONENT_POSTGRESQL_PASSWORD
+  - name: port
+    value: 5432
+  - name: storageType
+    value: ebs
+  - name: user
+    value: postgres
+  - name: volumeSize
+    value: 8Gi
+  - name: volumeType
+    value: gp2
+
+- name: component.postgresql
+  component: postgresql-rds
+  parameters:
+  - name: database
+    value: postgres
+  - name: name
+    value: postgresql-rds
+  - name: password
+    fromEnv: COMPONENT_POSTGRESQL_RDS_PASSWORD
+    default: postgres
+  - name: rds.instanceType
+    value: db.t2.small
+  - name: user
+    value: postgres
+  - name: volumeSize
+    value: '20'
+  - name: volumeType
+    value: gp2
+
+- name: component.redis
+  parameters:
+  - name: ha.enabled
+    value: 'false'
+  - name: ha.master
+    value: '1'
+  - name: ha.sentinel
+    value: '3'
+  - name: ha.slave
+    value: '1'
+  - name: usePassword
+    value: 'false'
+  - name: volumeSize
+    value: 8Gi
+
+- name: component.spinnaker
+  parameters:
+  - name: namespace
+    value: spinnaker
+
+- name: component.sysdig
+  parameters:
+  - name: license
+    fromEnv: COMPONENT_SYSDIG_LICENSE
+
+- name: component.wowza
+  parameters:
+  - name: license
+    fromEnv: COMPONENT_WOWZA_LICENSE

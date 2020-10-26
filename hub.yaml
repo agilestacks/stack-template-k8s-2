@@ -1,0 +1,50 @@
+---
+version: 1
+kind: stack
+meta:
+  name: k8s:2
+  brief: EKS stack with monitoring and DevOps tools
+
+components:
+- name: stack-k8s-eks
+  source:
+    dir: stack-k8s-eks
+- name: tiller
+  source:
+    dir: components/tiller
+- name: automation-tasks-namespace
+  source:
+    dir: components/namespace
+
+requires:
+- aws
+
+lifecycle:
+  verbs: [deploy, undeploy]
+  order:
+  - stack-k8s-eks
+  - tiller
+  - automation-tasks-namespace
+  mandatory:
+  - stack-k8s-eks
+  - tiller
+  - automation-tasks-namespace
+
+outputs:
+- name: cloud.kind
+- name: stack-k8s-eks:dns.domain
+- name: stack-k8s-eks:kubernetes.flavor
+- name: stack-k8s-eks:kubernetes.api.endpoint
+- name: stack-k8s-eks:kubernetes.api.caCert
+- name: stack-k8s-eks:kubernetes.api.token
+- name: stack-k8s-eks:kubernetes.eks.cluster
+- name: stack-k8s-eks:cloud.region
+- name: stack-k8s-eks:cloud.availabilityZone
+- name: stack-k8s-eks:cloud.availabilityZones
+- name: stack-k8s-eks:cloud.role.worker
+- name: stack-k8s-eks:cloud.vpc.id
+- name: stack-k8s-eks:cloud.vpc.cidr
+- name: stack-k8s-eks:cloud.vpc.worker.subnet.id
+- name: stack-k8s-eks:cloud.vpc.worker.subnet.ids
+- name: stack-k8s-eks:cloud.vpc.worker.sg.id
+- name: stack-k8s-eks:cloud.iam.worker.instanceProfile
