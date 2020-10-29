@@ -5,6 +5,7 @@ parameters:
     empty: allow
     fromEnv: EKS_CLUSTER
   - name: eks.admin
+    empty: allow
     fromEnv: EKS_ADMIN
   - name: worker
     parameters:
